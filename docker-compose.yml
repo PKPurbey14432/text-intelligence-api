@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  text-intelligence-api:
+    build: .
+    container_name: text-intelligence-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persist FAISS index and metadata across container restarts
+      - ./faiss_index.index:/app/faiss_index.index
+      - ./faiss_index.index.metadata.json:/app/faiss_index.index.metadata.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
